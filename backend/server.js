@@ -6,8 +6,16 @@ const connectDB = require("./config/db");
 connectDB();
 
 const app = express();
-app.use(cors());
+
 app.use(express.json());
+const corsOptions = {
+  origin: "http://localhost:3000", // your Next.js frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true, // if you plan to send cookies or Authorization headers
+};
+
+app.use(cors(corsOptions));
 
 // Routes
 app.use("/auth", require("./routes/authRoutes"));
