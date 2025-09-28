@@ -28,7 +28,7 @@ export default function NoteForm({ onAdd, disabled }) {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Title"
-        className="border p-2 rounded flex-1"
+        className="border p-2 rounded flex-1  text-gray-900"
         disabled={disabled}
       />
       <input
@@ -36,7 +36,7 @@ export default function NoteForm({ onAdd, disabled }) {
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="Content"
-        className="border p-2 rounded flex-1"
+        className="border p-2 rounded flex-1  text-gray-900"
         disabled={disabled}
       />
       <button

@@ -1,25 +1,37 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 
-const generateToken = (id) => jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: "1d"});
+const generateToken = (user) => {
+  return jwt.sign(
+    {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+      tenant: user.tenant.slug, 
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+  );
+};
+
 
 exports.login = async (req,res)=>{
   const { email, password } = req.body;
   const user = await User.findOne({ email }).populate("tenant");
  if (user && await user.matchPassword(password)) {
-  const token = generateToken(user._id);
+  const token = generateToken(user);
 
-  // Set cookie
+ 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: false,
     maxAge: 24 * 60 * 60 * 1000,
     sameSite: "lax",
   });
 
-  // Send JSON with token AND user
+ 
   res.json({
-    token,   // <-- keep this for frontend localStorage login
+    token,   
     user: { email: user.email, role: user.role, tenant: user.tenant.slug },
     message: "Login successful",
   });

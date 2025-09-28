@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import api from "../../services/api";
 import { useAuth } from "../../components/Auth/AuthContext";
 import NoteForm from "../../components/Notes/NoteForm";
@@ -14,17 +15,14 @@ export default function NotesPage() {
   const [noteLimitReached, setNoteLimitReached] = useState(false);
 
   useEffect(() => {
-    if (!user) return; // Wait until user is loaded
+    if (!user) return;
     fetchNotes();
   }, [user]);
 
-  // Fetch notes for current tenant
   const fetchNotes = async () => {
     try {
       const res = await api.get("/notes");
       setNotes(res.data);
-
-      // Check note limit only for Members
       if (user) {
         setNoteLimitReached(user.role === "Member" && res.data.length >= 3);
       }
@@ -35,47 +33,61 @@ export default function NotesPage() {
     }
   };
 
-  // Add new note
   const addNote = (newNote) => {
     const updatedNotes = [newNote, ...notes];
     setNotes(updatedNotes);
-
-    // Check note limit
     if (user) setNoteLimitReached(user.role === "Member" && updatedNotes.length >= 3);
   };
 
-  // Remove note
   const removeNote = (id) => {
     const updatedNotes = notes.filter((note) => note._id !== id);
     setNotes(updatedNotes);
-
     if (user) setNoteLimitReached(user.role === "Member" && updatedNotes.length >= 3);
   };
 
-  if (!user) return <div className="p-4">Loading user...</div>;
-  if (loading) return <div className="p-4">Loading notes...</div>;
+  if (!user) return <div className="p-4 text-center text-gray-600">Loading user...</div>;
+  if (loading) return <div className="p-4 text-center text-gray-600">Loading notes...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold mb-4">Notes Dashboard</h1>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 p-6">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-blue-700">Notes Dashboard</h1>
+        <Link
+          href="/users"
+          className="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+        >
+          Manage Users
+        </Link>
+      </div>
 
-      {/* Show upgrade button for Admin if note limit reached */}
+      {/* Upgrade Button */}
       {user.role === "Admin" && noteLimitReached && (
-        <div className="mb-4">
+        <div className="mb-4 flex justify-center">
           <UpgradeButton tenantSlug={user.tenant} onUpgrade={fetchNotes} />
         </div>
       )}
 
-      {/* Show note form only if limit not reached */}
-      {!noteLimitReached && <NoteForm onAdd={addNote} />}
+      {/* Note Form */}
+      {!noteLimitReached && (
+        <div className="mb-6">
+          <NoteForm onAdd={addNote} />
+        </div>
+      )}
 
-      <div className="mt-6 grid gap-4">
+      {/* Notes List */}
+      <div className="grid gap-4">
         {notes.length > 0 ? (
           notes.map((note) => (
-            <NoteItem key={note._id} note={note} onDelete={removeNote} />
+            <NoteItem
+              key={note._id}
+              note={note}
+              onDelete={removeNote}
+              className="bg-white shadow-md rounded-lg p-4"
+            />
           ))
         ) : (
-          <p>No notes yet.</p>
+          <p className="text-center text-gray-500">No notes yet. Start by adding one!</p>
         )}
       </div>
     </div>

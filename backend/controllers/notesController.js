@@ -8,7 +8,7 @@ exports.getNotes = async (req,res)=>{
 exports.createNote = async (req,res)=>{
   const { title, content } = req.body;
 
-  // Check subscription limit
+
   if(req.user.tenant.subscription === "FREE"){
     const count = await Note.countDocuments({ tenant: req.user.tenant._id });
     if(count >= 3) return res.status(403).json({message: "Free plan limit reached"});
