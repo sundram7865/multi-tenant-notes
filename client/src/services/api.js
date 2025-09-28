@@ -1,10 +1,9 @@
 // client/services/api.js
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:4444"
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL:  process.env.NEXT_PUBLIC_API_BASE_URL,
 });
 
 // Add JWT token to request headers
